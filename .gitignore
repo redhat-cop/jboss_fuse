@@ -1,0 +1,4 @@
+tests/roles
+tests/*.zip
+tests/*_rsa
+tests/*_dsa
