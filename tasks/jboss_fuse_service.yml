@@ -1,0 +1,35 @@
+##
+#https://access.redhat.com/documentation/en-US/Red_Hat_JBoss_Fuse/6.1/html-single/Configuring_and_Running_Red_Hat_JBoss_Fuse/#ESBAdminService
+##
+- name: Create JBoss Fuse Group
+  group:
+    name: "{{ jboss_fuse_group }}"
+    system: yes
+    state: present
+    gid: "400"
+  tags:
+    - jboss_fuse
+
+- name: Create JBoss Fuse User
+  user:
+    name: "{{ jboss_fuse_user }}"
+    comment: "JBoss Fuse User"
+    uid: "400"
+    group: "{{ jboss_fuse_group }}"
+    home: "{{ jboss_fuse_library_dest }}"
+    shell: "/bin/bash"
+  tags:
+    - jboss_fuse
+
+- name: Create JBoss Fuse Library Destination
+  become: true
+  file:
+    path: "{{ jboss_fuse_library_dest }}"
+    owner: "{{ jboss_fuse_user }}"
+    group: "{{ jboss_fuse_group }}"
+    state: directory
+    mode: "755"
+  tags:
+    - jboss_fuse
+
+## WIP Adding Fuse as Service
