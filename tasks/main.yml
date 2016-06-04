@@ -49,7 +49,7 @@
 #### Defensive Programming To Check If FUSE Is Already Installed
 
 - name: Check Existence of Libraries
-  sudo: true
+  become: true
   stat:
     path: "{{ jboss_fuse_library_dest + '/jboss-fuse-6.2.1.redhat-084/etc/org.apache.karaf.features.cfg'}}"
   register: jboss_fuse_exists
@@ -89,7 +89,7 @@
   when: transfer_method == 'copy-from-controller' and jboss_fuse_exists.stat.exists == false
 
 - name: Extract JBoss Fuse Libraries
-  sudo: true
+  become: true
   unarchive:
     src: "{{ jboss_fuse_artifact_dl_dest }}"
     dest: "{{ jboss_fuse_library_dest }}"
@@ -100,3 +100,17 @@
   tags:
     - jboss_fuse
   when: jboss_fuse_exists.stat.exists == false
+
+## Sane defaults 
+
+- name: Create Default Fuse Admin User
+  become_user: "{{jboss_fuse_user}}"
+  lineinfile: 
+    dest: "{{jboss_fuse_home}}/etc/users.properties"
+    regexp: "^(#?){{ item.username }}=(.*)$"
+    line: "{{ item.username ~ '=' ~ item.password ~ ',' ~ item.roles|join(',')}}"
+    insertbefore: EOF
+  with_items: "{{jboss_fuse_users}}"
+  tags:
+    - jboss_fuse
+  when: jboss_fuse_exists.stat.exists == true
