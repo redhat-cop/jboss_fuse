@@ -1,0 +1,22 @@
+---
+jboss_fuse_artifact_source: https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=41311
+jboss_fuse_artifact_name: jboss-fuse-full-6.2.1.redhat-084.zip
+
+jboss_fuse_user: jboss-fuse
+
+jboss_fuse_version: 6.2
+
+jboss_fuse_users: 
+  - 
+    password: redhat
+    roles: 
+      - Administrator
+    username: admin
+  - 
+    password: guest
+    roles: 
+      - viewer
+    username: guest
+
+# ussually this is set at the playbook level
+#transfer_method: # csp-to-host | copy-from-contoller

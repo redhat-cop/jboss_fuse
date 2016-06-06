@@ -1,0 +1,5 @@
+inventory:
+  - name: jboss_fuse_centos7
+    image: "chrismeyers/centos7"
+  - name: jboss_fuse_centos6
+    image: "chrismeyers/centos6"

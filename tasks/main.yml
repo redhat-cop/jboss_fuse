@@ -1,0 +1,116 @@
+---
+
+#### Defensive Programming
+# https://github.com/openshift/openshift-ansible/blob/master/docs/best_practices_guide.adoc
+
+- name: Fail for Missing Transfer Method
+  fail: msg="This role requires transfer_method to be set and non empty. See the README"
+  when: transfer_method is not defined or transfer_method == ''
+  tags:
+    - jboss_fuse
+
+- name: Fail for Missing Red Hat Network Username
+  fail: msg="This role requires rhn_username to be set and non empty."
+  when: transfer_method == 'csp-to-host' and (rhn_username is not defined or rhn_username == '')
+  tags:
+    - jboss_fuse
+
+- name: Fail for Missing Red Hat Network Password
+  fail: msg="This role requires rhn_password to be set and non empty."
+  when: transfer_method == 'csp-to-host' and (rhn_password is not defined or rhn_password == '')
+  tags:
+    - jboss_fuse
+
+#### Set Facts
+- name: Set JBoss Fuse Download Facts
+  set_fact:
+    jboss_fuse_artifact_url: "{{ jboss_fuse_artifact_source }}"
+    jboss_fuse_artifact_dl_dest: "{{ '/tmp/' + jboss_fuse_artifact_name }}"
+    jboss_fuse_library_dest: "/opt/{{ jboss_fuse_user }}"
+  tags:
+    - jboss_fuse
+
+- name: Set JBoss Fuse Group Facts
+  set_fact:
+    jboss_fuse_group: "{{ jboss_fuse_user }}"
+  tags:
+    - jboss_fuse
+
+- name: Set JBoss Fuse Service Directories Facts
+  set_fact:
+    jboss_fuse_home: "{{ jboss_fuse_library_dest }}/jboss-fuse-6.2.1.redhat-084"
+  tags:
+    - jboss_fuse
+
+#### Create Service Account
+
+- include: jboss_fuse_service.yml
+
+#### Defensive Programming To Check If FUSE Is Already Installed
+
+- name: Check Existence of Libraries
+  become: true
+  stat:
+    path: "{{ jboss_fuse_library_dest + '/jboss-fuse-6.2.1.redhat-084/etc/org.apache.karaf.features.cfg'}}"
+  register: jboss_fuse_exists
+  tags:
+    - jboss_fuse
+
+#### Download and install base library and patch
+- name: Async Download JBoss Fuse from Red Hat Customer Portal
+  redhat_csp_download:
+    url: "{{ jboss_fuse_artifact_url }}"
+    dest: "{{ jboss_fuse_artifact_dl_dest }}"
+    username: "{{ rhn_username }}"
+    password: "{{ rhn_password }}"
+  async: 7200
+  poll: 0
+  register: jboss_fuse_download
+  tags:
+    - jboss_fuse
+  when: transfer_method == 'csp-to-host' and jboss_fuse_exists.stat.exists == false
+
+- name: 'Check On JBoss Fuse Download Completion'
+  async_status: jid={{ jboss_fuse_download.ansible_job_id }}
+  register: job_result1
+  until: job_result1.finished
+  retries: 600
+  delay: 10
+  tags:
+    - jboss_fuse
+  when: transfer_method == 'csp-to-host' and jboss_fuse_exists.stat.exists == false
+
+- name: Copy JBoss Fuse
+  copy:
+    src: "{{ jboss_fuse_artifact_name }}"
+    dest: "{{ jboss_fuse_artifact_dl_dest }}"
+  tags:
+    - jboss_fuse
+  when: transfer_method == 'copy-from-controller' and jboss_fuse_exists.stat.exists == false
+
+- name: Extract JBoss Fuse Libraries
+  become: true
+  unarchive:
+    src: "{{ jboss_fuse_artifact_dl_dest }}"
+    dest: "{{ jboss_fuse_library_dest }}"
+    creates: jboss-fuse-6.2.1.redhat-084
+    copy: no
+    owner: "{{ jboss_fuse_user }}"
+    group: "{{ jboss_fuse_group }}"
+  tags:
+    - jboss_fuse
+  when: jboss_fuse_exists.stat.exists == false
+
+## Sane defaults 
+
+- name: Create Default Fuse Admin User
+  become_user: "{{jboss_fuse_user}}"
+  lineinfile: 
+    dest: "{{jboss_fuse_home}}/etc/users.properties"
+    regexp: "^(#?){{ item.username }}=(.*)$"
+    line: "{{ item.username ~ '=' ~ item.password ~ ',' ~ item.roles|join(',')}}"
+    insertbefore: EOF
+  with_items: "{{jboss_fuse_users}}"
+  tags:
+    - jboss_fuse
+  when: jboss_fuse_exists.stat.exists == true
