@@ -6,6 +6,12 @@ jboss_fuse_user: jboss-fuse
 
 jboss_fuse_version: 6.2
 
+jboss_fuse_ssh_port: 8101
+
+jboss_fuse_ssh_user: admin
+
+jboss_fuse_ssh_user_password: redhat
+
 jboss_fuse_users: 
   - 
     password: redhat

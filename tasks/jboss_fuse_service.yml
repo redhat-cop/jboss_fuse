@@ -32,4 +32,29 @@
   tags:
     - jboss_fuse
 
-## WIP Adding Fuse as Service
+## WIP Adding Fuse as Service, for now its starts the fuse daemon on all nodes
+## 
+
+- name: Verify jboss-fuse is running
+  wait_for: 
+    port: "{{jboss_fuse_ssh_port}}" 
+    host: "{{ ansible_ssh_host }}" 
+    state: started 
+    timeout: 3
+  ignore_errors: true
+  register: fuse_run_state
+  tags: jboss_fuse
+
+##
+# Since fuse daemon starts in background its essential to make 
+# fuse command run with aysync mode to prevent killing by Ansible
+# ref: http://docs.ansible.com/ansible/playbooks_async.html
+##
+- name: Start Fuse
+  become_user: "{{jboss_fuse_user}}"
+  command: "{{jboss_fuse_home}}/bin/start"
+  async: 30
+  poll: 5
+  register: fuse_start_state
+  when: (fuse_run_state.failed is defined ) and ( fuse_run_state.failed == true)
+  tags: jboss_fuse
