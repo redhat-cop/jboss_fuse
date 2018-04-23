@@ -104,13 +104,13 @@
 ## Sane defaults 
 
   - name: Create Default Fuse Admin User
-    become_user: "{{jboss_fuse_user}}"
+    become_user: "{{ jboss_fuse_user }}"
     lineinfile: 
       dest: "{{jboss_fuse_home}}/etc/users.properties"
       regexp: "^(#?){{ item.username }}=(.*)$"
       line: "{{ item.username ~ '=' ~ item.password ~ ',' ~ item.roles|join(',')}}"
       insertbefore: EOF
-    with_items: "{{jboss_fuse_users}}"
+    with_items: "{{ jboss_fuse_users }}"
     tags:
       - jboss_fuse
     when: jboss_fuse_exists.stat.exists == true
