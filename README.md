@@ -20,8 +20,8 @@ Our playbooks provide these dependencies in a [common role](https://github.com/r
 Example Playbooks
 ----------------
 
-- [JBoss Fuse 6.2.1 on CentOS 7](https://github.com/redhat-cop/ansible-middleware-playbooks/blob/master/fuse6.4-centos7.yml)
-- [JBoss Fuse 6.2.1 on RHEL 7](https://github.com/redhat-cop/ansible-middleware-playbooks/blob/master/fuse6.4-rhel7.yml)
+- [JBoss Fuse 6.2.1 on CentOS 7](https://github.com/redhat-cop/ansible-middleware-playbooks/blob/master/fuse6.2-centos7-csp.yml)
+- [JBoss Fuse 6.2.1 on RHEL 7](https://github.com/redhat-cop/ansible-middleware-playbooks/blob/master/fuse6.2-rhel7.yml)
 
 License
 -------
