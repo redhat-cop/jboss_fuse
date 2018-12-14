@@ -1,0 +1,23 @@
+sudo: required
+language: python
+python:
+  - "2.7"
+env:
+  global:
+    - ANSIBLE_HOST_KEY_CHECKING=False
+
+before_install:
+  - sudo apt-get update -qq
+
+install:
+  - sudo pip install ansible==2.4
+  - sudo pip install docker-py
+  - sudo pip install six --upgrade
+  - sudo apt-get install -y sshpass
+  - ansible-galaxy install -r tests/requirements.yml -p tests/roles
+
+services:
+  - docker
+
+script:
+  - ansible-playbook -i tests/inventory tests/syntax-check.yml --syntax-check
