@@ -1,3 +1,7 @@
+# DEPRECATED - This repository is no longer maintained
+
+**Capabilities provided by this repository have migrated to the [ansible-middleware](https://github.com/ansible-middleware) project.**
+
 Ansible JBoss Fuse Role [![Build Status](https://travis-ci.org/redhat-cop/jboss_fuse.svg)](https://travis-ci.org/redhat-cop/jboss_fuse)
 =================
 
@@ -7,7 +11,6 @@ Transfer Method
 ------------
 
 This role supports a few different mechanism for transferring the product zip files to the target host. These are documented on [the main playbooks README](https://github.com/redhat-cop/ansible-middleware-playbooks), as the methods are supported across a variety of roles.
-
 
 Dependencies
 ------------
@@ -31,7 +34,7 @@ License
 Authors Information
 ------------------
 
-* [Andrew Block](https://github.com/sabre1041)
-* [Albert Wong](https://github.com/alberttwong)
-* [Justin Holmes](https://github.com/sherl0cks)
-* [Kamesh Sampath](https://github.com/kameshsampath)
+- [Andrew Block](https://github.com/sabre1041)
+- [Albert Wong](https://github.com/alberttwong)
+- [Justin Holmes](https://github.com/sherl0cks)
+- [Kamesh Sampath](https://github.com/kameshsampath)
